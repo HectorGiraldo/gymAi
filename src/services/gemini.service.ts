@@ -12,11 +12,25 @@ export class GeminiService {
   constructor() {
     // IMPORTANT: This relies on the environment variable being set.
     // In a real Applet environment, this should be securely provided.
-    const apiKey = process.env.API_KEY;
+    // Try several locations where a developer might place the key:
+    // 1) process.env.GEMINI_API_KEY (common server-side / build-time variable)
+    // 2) process.env.API_KEY (legacy)
+    // 3) window.GEMINI_API_KEY (injected at runtime for local dev)
+    // 4) window.API_KEY (legacy)
+    const win = typeof window !== 'undefined' ? (window as any) : undefined;
+    const env = (typeof process !== 'undefined' && (process as any).env) ? (process as any).env : undefined;
+    const apiKey = (env && env.GEMINI_API_KEY)
+      || (env && env.API_KEY)
+      || (win && win.GEMINI_API_KEY)
+      || (win && win.API_KEY);
+
     if (!apiKey) {
-      throw new Error('API_KEY environment variable not set.');
+      throw new Error('Gemini API key not found. Set GEMINI_API_KEY in your environment or inject window.GEMINI_API_KEY for local development.');
     }
-    this.ai = new GoogleGenAI({ apiKey });
+
+    // If the key was provided with quotes in an env file, strip them
+    const normalizedKey = typeof apiKey === 'string' ? apiKey.replace(/^\"|\"$/g, "") : apiKey;
+    this.ai = new GoogleGenAI({ apiKey: normalizedKey });
   }
 
   async generateRoutine(profile: UserProfile): Promise<WeeklyRoutine> {

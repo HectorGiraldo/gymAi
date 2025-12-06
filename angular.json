@@ -16,6 +16,9 @@
               "base": "./dist",
               "browser": "."
             },
+            "assets": [
+              "assets"
+            ],
             "browser": "index.tsx",
             "tsConfig": "tsconfig.json"
           },
@@ -48,5 +51,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

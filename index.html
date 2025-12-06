@@ -22,6 +22,20 @@
       background: #6b7280; /* bg-gray-500 */
     }
   </style>
+  <!--
+    For local development you can inject your Gemini API key at runtime
+    by adding a small script before the application bootstraps. Example:
+
+    <script>
+      // WARNING: embedding API keys in client-side code is insecure.
+      // Use only for local testing with a restricted key.
+      window.GEMINI_API_KEY = 'YOUR_LOCAL_KEY_HERE';
+    </script>
+
+    Do NOT commit real keys to source control. Prefer secure server-side
+    proxies or Secret Manager for production.
+  -->
+  <script src="assets/env.js"></script>
 <script type="importmap">
 {
   "imports": {

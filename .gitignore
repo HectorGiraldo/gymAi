@@ -8,9 +8,14 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.angular
 dist
 dist-ssr
 *.local
+
+# Generated local env for client-side testing
+assets/env.js
+src/assets/env.js
 
 # Editor directories and files
 .vscode/*
