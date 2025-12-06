@@ -1,0 +1,5 @@
+{
+  "name": "AI Gym Routine Generator",
+  "description": "An intelligent gym assistant that generates personalized weekly workout routines. It learns from your progress to create better plans, complete with visual guides for each exercise.",
+  "requestFramePermissions": []
+}

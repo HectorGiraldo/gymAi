@@ -1,0 +1,45 @@
+<div class="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-900">
+  <div class="w-full max-w-lg p-8 space-y-8 bg-gray-800 rounded-2xl shadow-2xl">
+    <div class="text-center">
+      <h1 class="text-4xl font-bold text-white">Planificador de Gimnasio IA</h1>
+      <p class="mt-2 text-gray-400">Cuéntanos sobre ti para generar una rutina personalizada.</p>
+    </div>
+
+    <form (ngSubmit)="submitForm()" class="space-y-6">
+      <!-- Experience Level -->
+      <div>
+        <label for="experience-select" class="block text-sm font-medium text-gray-300 mb-2">Nivel de Experiencia</label>
+        <select id="experience-select" [(ngModel)]="experience" name="experience" class="block w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-cyan-500 focus:border-cyan-500">
+          @for (level of experienceLevels; track level) {
+            <option [value]="level">{{experienceLabels[level]}}</option>
+          }
+        </select>
+      </div>
+      
+      <!-- Goal -->
+      <div>
+        <label for="goal-select" class="block text-sm font-medium text-gray-300 mb-2">Tu Objetivo Principal</label>
+        <select id="goal-select" [(ngModel)]="goal" name="goal" class="block w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-cyan-500 focus:border-cyan-500">
+          @for (g of goals; track g.key) {
+            <option [value]="g.key">{{g.label}}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Days Per Week -->
+      <div>
+        <label for="days-select" class="block text-sm font-medium text-gray-300 mb-2">Días de Entrenamiento por Semana</label>
+        <select id="days-select" [(ngModel)]="daysPerWeek" name="daysPerWeek" class="block w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-cyan-500 focus:border-cyan-500">
+          @for (day of trainingDays; track day) {
+            <option [value]="day">{{day}}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="w-full px-5 py-4 text-base font-medium text-center text-white bg-green-600 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-500/50 transition-transform duration-200 ease-in-out hover:scale-105">
+        Generar Mi Rutina
+      </button>
+    </form>
+  </div>
+</div>
