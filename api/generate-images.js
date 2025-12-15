@@ -1,5 +1,3 @@
-const { GoogleGenAI } = require("@google/genai");
-
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -7,6 +5,10 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // dynamic import to support ESM-only packages
+    const genai = await import("@google/genai");
+    const GoogleGenAI = genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
+
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
     const { exerciseName } = body;
@@ -52,6 +54,7 @@ module.exports = async (req, res) => {
       });
   } catch (error) {
     console.error("Error in generate-images:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    const message = (error && error.message) || String(error) || "Internal server error";
+    return res.status(500).json({ error: message });
   }
 };

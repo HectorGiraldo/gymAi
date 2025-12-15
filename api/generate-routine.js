@@ -1,5 +1,3 @@
-const { GoogleGenAI, Type } = require("@google/genai");
-
 module.exports = async (req, res) => {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
@@ -7,6 +5,11 @@ module.exports = async (req, res) => {
   }
 
   try {
+    // dynamic import to support ESM-only packages and avoid require issues
+    const genai = await import("@google/genai");
+    const GoogleGenAI = genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
+    const Type = genai.Type || genai.default?.Type;
+
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
     const { days, experience, goal } = body;
@@ -79,7 +82,10 @@ module.exports = async (req, res) => {
 
     return res.status(200).json(parsed);
   } catch (error) {
+    // Log full error server-side for Vercel logs
     console.error("Error in generate-routine:", error);
-    return res.status(500).json({ error: "Internal server error" });
+    // Return a helpful message to client for debugging (avoid leaking secrets)
+    const message = (error && error.message) || String(error) || "Internal server error";
+    return res.status(500).json({ error: message });
   }
 };
