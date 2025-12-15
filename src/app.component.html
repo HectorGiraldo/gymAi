@@ -9,6 +9,13 @@
       <p class="mt-3 text-lg text-gray-400 max-w-2xl mx-auto">
         Crea un plan de entrenamiento personalizado, visual y con seguimiento de progreso.
       </p>
+      @if (view() === 'form' && !loading()) {
+        <div class="flex justify-center mt-4 mb-6">
+          <button (click)="showHistory()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-300">
+            Ver Historial
+          </button>
+        </div>
+      }
     </div>
 
     @if (view() !== 'form' && !loading()) {
