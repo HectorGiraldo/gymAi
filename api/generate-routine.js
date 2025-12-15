@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
@@ -6,7 +6,22 @@ module.exports = async (req, res) => {
 
   try {
     // dynamic import to support ESM-only packages and avoid require issues
-    const genai = await import("@google/genai");
+    // Basic invocation log for debugging (do NOT log secret contents)
+    console.log("generate-routine invoked", {
+      hasApiKey: !!process.env.API_KEY,
+      nodeVersion: process.version,
+    });
+
+    // dynamic import to support ESM-only packages and avoid require issues
+    let genai;
+    try {
+      genai = await import("@google/genai");
+    } catch (impErr) {
+      console.error("Failed to import @google/genai", impErr);
+      return res.status(500).json({
+        error: "Failed to import @google/genai: " + (impErr && impErr.message),
+      });
+    }
     const GoogleGenAI =
       genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
     const Type = genai.Type || genai.default?.Type;
@@ -57,17 +72,25 @@ module.exports = async (req, res) => {
       required: ["weeklyRoutine"],
     };
 
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-      config: {
-        systemInstruction:
-          "Eres un entrenador personal experto. Responde ÚNICAMENTE con un objeto JSON válido que siga el esquema proporcionado.",
-        responseMimeType: "application/json",
-        responseSchema: routineSchema,
-        temperature: 0.7,
-      },
-    });
+    let response;
+    try {
+      response = await ai.models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: {
+          systemInstruction:
+            "Eres un entrenador personal experto. Responde ÚNICAMENTE con un objeto JSON válido que siga el esquema proporcionado.",
+          responseMimeType: "application/json",
+          responseSchema: routineSchema,
+          temperature: 0.7,
+        },
+      });
+    } catch (sdkErr) {
+      console.error("SDK generateContent error:", sdkErr);
+      return res
+        .status(500)
+        .json({ error: "AI SDK error: " + (sdkErr && sdkErr.message) });
+    }
 
     const jsonText =
       response.text && response.text.trim
@@ -90,4 +113,4 @@ module.exports = async (req, res) => {
       (error && error.message) || String(error) || "Internal server error";
     return res.status(500).json({ error: message });
   }
-};
+}

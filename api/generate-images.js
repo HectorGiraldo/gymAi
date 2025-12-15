@@ -1,4 +1,4 @@
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed" });
@@ -6,7 +6,22 @@ module.exports = async (req, res) => {
 
   try {
     // dynamic import to support ESM-only packages
-    const genai = await import("@google/genai");
+    // Basic invocation log for debugging (do NOT log secret contents)
+    console.log("generate-images invoked", {
+      hasApiKey: !!process.env.API_KEY,
+      nodeVersion: process.version,
+    });
+
+    // dynamic import to support ESM-only packages
+    let genai;
+    try {
+      genai = await import("@google/genai");
+    } catch (impErr) {
+      console.error("Failed to import @google/genai", impErr);
+      return res.status(500).json({
+        error: "Failed to import @google/genai: " + (impErr && impErr.message),
+      });
+    }
     const GoogleGenAI =
       genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
 
@@ -31,18 +46,26 @@ module.exports = async (req, res) => {
     const startPrompt = `Ilustración profesional de fitness, estilo vector limpio, mostrando la posición inicial de "${exerciseName}". Fondo blanco, enfoque anatómico.`;
     const endPrompt = `Ilustración profesional de fitness, estilo vector limpio, mostrando la posición final o el punto de máxima contracción de "${exerciseName}". Fondo blanco, enfoque anatómico.`;
 
-    const [startImageResponse, endImageResponse] = await Promise.all([
-      ai.models.generateImages({
-        model: "imagen-4.0-generate-001",
-        prompt: startPrompt,
-        config: commonConfig,
-      }),
-      ai.models.generateImages({
-        model: "imagen-4.0-generate-001",
-        prompt: endPrompt,
-        config: commonConfig,
-      }),
-    ]);
+    let startImageResponse, endImageResponse;
+    try {
+      [startImageResponse, endImageResponse] = await Promise.all([
+        ai.models.generateImages({
+          model: "imagen-4.0-generate-001",
+          prompt: startPrompt,
+          config: commonConfig,
+        }),
+        ai.models.generateImages({
+          model: "imagen-4.0-generate-001",
+          prompt: endPrompt,
+          config: commonConfig,
+        }),
+      ]);
+    } catch (sdkErr) {
+      console.error("SDK generateImages error:", sdkErr);
+      return res
+        .status(500)
+        .json({ error: "AI SDK error: " + (sdkErr && sdkErr.message) });
+    }
 
     const startBase64 = startImageResponse.generatedImages[0].image.imageBytes;
     const endBase64 = endImageResponse.generatedImages[0].image.imageBytes;
@@ -57,4 +80,4 @@ module.exports = async (req, res) => {
       (error && error.message) || String(error) || "Internal server error";
     return res.status(500).json({ error: message });
   }
-};
+}
