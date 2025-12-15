@@ -1,17 +1,20 @@
-const { GoogleGenAI, Type } = require('@google/genai');
+const { GoogleGenAI, Type } = require("@google/genai");
 
 module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", "POST");
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   try {
-    const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body || {};
+    const body =
+      typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
     const { days, experience, goal } = body;
 
     if (!process.env.API_KEY) {
-      return res.status(500).json({ error: 'API_KEY environment variable not set on server' });
+      return res
+        .status(500)
+        .json({ error: "API_KEY environment variable not set on server" });
     }
 
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -37,42 +40,46 @@ module.exports = async (req, res) => {
                     sets: { type: Type.STRING },
                     reps: { type: Type.STRING },
                     rest: { type: Type.STRING },
-                    description: { type: Type.STRING }
+                    description: { type: Type.STRING },
                   },
-                  required: ['name', 'sets', 'reps', 'rest', 'description']
-                }
-              }
+                  required: ["name", "sets", "reps", "rest", "description"],
+                },
+              },
             },
-            required: ['day', 'focus', 'exercises']
-          }
-        }
+            required: ["day", "focus", "exercises"],
+          },
+        },
       },
-      required: ['weeklyRoutine']
+      required: ["weeklyRoutine"],
     };
 
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: "gemini-2.5-flash",
       contents: prompt,
       config: {
-        systemInstruction: 'Eres un entrenador personal experto. Responde ÚNICAMENTE con un objeto JSON válido que siga el esquema proporcionado.',
-        responseMimeType: 'application/json',
+        systemInstruction:
+          "Eres un entrenador personal experto. Responde ÚNICAMENTE con un objeto JSON válido que siga el esquema proporcionado.",
+        responseMimeType: "application/json",
         responseSchema: routineSchema,
-        temperature: 0.7
-      }
+        temperature: 0.7,
+      },
     });
 
-    const jsonText = response.text && response.text.trim ? response.text.trim() : JSON.stringify(response);
+    const jsonText =
+      response.text && response.text.trim
+        ? response.text.trim()
+        : JSON.stringify(response);
     let parsed;
     try {
       parsed = JSON.parse(jsonText);
     } catch (err) {
-      console.error('Failed to parse AI response as JSON:', jsonText, err);
-      return res.status(500).json({ error: 'Invalid response from AI' });
+      console.error("Failed to parse AI response as JSON:", jsonText, err);
+      return res.status(500).json({ error: "Invalid response from AI" });
     }
 
     return res.status(200).json(parsed);
   } catch (error) {
-    console.error('Error in generate-routine:', error);
-    return res.status(500).json({ error: 'Internal server error' });
+    console.error("Error in generate-routine:", error);
+    return res.status(500).json({ error: "Internal server error" });
   }
 };
