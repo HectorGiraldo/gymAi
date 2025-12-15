@@ -7,7 +7,8 @@ module.exports = async (req, res) => {
   try {
     // dynamic import to support ESM-only packages and avoid require issues
     const genai = await import("@google/genai");
-    const GoogleGenAI = genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
+    const GoogleGenAI =
+      genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
     const Type = genai.Type || genai.default?.Type;
 
     const body =
@@ -85,7 +86,8 @@ module.exports = async (req, res) => {
     // Log full error server-side for Vercel logs
     console.error("Error in generate-routine:", error);
     // Return a helpful message to client for debugging (avoid leaking secrets)
-    const message = (error && error.message) || String(error) || "Internal server error";
+    const message =
+      (error && error.message) || String(error) || "Internal server error";
     return res.status(500).json({ error: message });
   }
 };

@@ -7,7 +7,8 @@ module.exports = async (req, res) => {
   try {
     // dynamic import to support ESM-only packages
     const genai = await import("@google/genai");
-    const GoogleGenAI = genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
+    const GoogleGenAI =
+      genai.GoogleGenAI || genai.default?.GoogleGenAI || genai.default;
 
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body || {};
@@ -46,15 +47,14 @@ module.exports = async (req, res) => {
     const startBase64 = startImageResponse.generatedImages[0].image.imageBytes;
     const endBase64 = endImageResponse.generatedImages[0].image.imageBytes;
 
-    return res
-      .status(200)
-      .json({
-        start: `data:image/jpeg;base64,${startBase64}`,
-        end: `data:image/jpeg;base64,${endBase64}`,
-      });
+    return res.status(200).json({
+      start: `data:image/jpeg;base64,${startBase64}`,
+      end: `data:image/jpeg;base64,${endBase64}`,
+    });
   } catch (error) {
     console.error("Error in generate-images:", error);
-    const message = (error && error.message) || String(error) || "Internal server error";
+    const message =
+      (error && error.message) || String(error) || "Internal server error";
     return res.status(500).json({ error: message });
   }
 };
