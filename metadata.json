@@ -1,0 +1,5 @@
+{
+  "name": "Generador de Rutinas de Gimnasio AI",
+  "description": "Una aplicación inteligente que crea rutinas de gimnasio personalizadas basadas en tus días de entrenamiento, experiencia y objetivos, utilizando la potencia de la IA.",
+  "requestFramePermissions": []
+}
