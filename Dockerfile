@@ -1,21 +1,25 @@
-# Etapa 1: Construcción
+# Etapa 1: Build
 FROM node:22.12.0-alpine AS build
 WORKDIR /app
 
-# Copiar archivos de dependencias
+# Instalamos dependencias primero para aprovechar la caché de Docker
 COPY package*.json ./
 RUN npm ci
 
-# Copiar el resto del código y compilar
+# Copiamos el resto y construimos
 COPY . .
 RUN npm run build
 
-# Etapa 2: Servidor de producción (Nginx)
+# Etapa 2: Producción con Nginx
 FROM nginx:alpine
-# Ajusta la ruta 'dist/generador-de-rutinas-de-gimnasio-ai/browser' 
-# si tu Angular compila en otra carpeta (mira tu angular.json)
+
+# ¡OJO! Verifica que esta ruta coincida con tu carpeta de salida en 'dist'
+# Algunos Angular modernos generan 'dist/[nombre-app]/browser'
 COPY --from=build /app/dist/generador-de-rutinas-de-gimnasio-ai/browser /usr/share/nginx/html
-COPY --from=build /app/nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copiamos nuestra config de Nginx
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
+
 CMD ["nginx", "-g", "daemon off;"]
