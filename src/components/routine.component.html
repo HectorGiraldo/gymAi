@@ -43,22 +43,9 @@
             <div class="px-6 pb-4 border-t border-gray-700">
               <p class="mt-4 text-gray-300">{{ exercise.description }}</p>
               
-              @if (imageStates().get(exercise.name); as imgState) {
+              @if (imageUrls().get(exercise.name); as imageUrl) {
                 <div class="mt-4 aspect-square bg-gray-700 rounded-lg flex items-center justify-center">
-                  @switch (imgState.state) {
-                    @case ('loading') {
-                      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-400"></div>
-                    }
-                    @case ('loaded') {
-                      <img [src]="imgState.url" alt="Image of {{ exercise.name }}" class="w-full h-full object-cover rounded-lg">
-                    }
-                    @case ('error') {
-                      <div class="text-center text-red-400">
-                        <p>Error al cargar la imagen.</p>
-                        <p class="text-sm">Por favor, inténtalo de nuevo.</p>
-                      </div>
-                    }
-                  }
+                  <img [src]="imageUrl" alt="Image of {{ exercise.name }}" class="w-full h-full object-cover rounded-lg">
                 </div>
               }
             </div>

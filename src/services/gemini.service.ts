@@ -95,23 +95,23 @@ export class GeminiService {
     }
   }
   
-  async generateExerciseImage(prompt: string): Promise<string> {
-    if (this.imageCache.has(prompt)) {
-      return this.imageCache.get(prompt)!;
-    }
+  // async generateExerciseImage(prompt: string): Promise<string> {
+  //   if (this.imageCache.has(prompt)) {
+  //     return this.imageCache.get(prompt)!;
+  //   }
 
-    const response = await this.ai.models.generateImages({
-      model: 'imagen-4.0-generate-001',
-      prompt: prompt,
-      config: {
-        numberOfImages: 1,
-        outputMimeType: 'image/jpeg',
-        aspectRatio: '1:1',
-      },
-    });
+  //   const response = await this.ai.models.generateImages({
+  //     model: 'imagen-4.0-generate-001',
+  //     prompt: prompt,
+  //     config: {
+  //       numberOfImages: 1,
+  //       outputMimeType: 'image/jpeg',
+  //       aspectRatio: '1:1',
+  //     },
+  //   });
 
-    const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
-    this.imageCache.set(prompt, base64ImageBytes);
-    return base64ImageBytes;
-  }
+  //   const base64ImageBytes: string = response.generatedImages[0].image.imageBytes;
+  //   this.imageCache.set(prompt, base64ImageBytes);
+  //   return base64ImageBytes;
+  // }
 }

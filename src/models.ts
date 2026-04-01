@@ -9,7 +9,6 @@ export interface Exercise {
   description: string;
   sets: number;
   reps: string;
-  image_prompt: string;
 }
 
 export interface DailyWorkout {
@@ -20,9 +19,4 @@ export interface DailyWorkout {
 
 export interface WeeklyRoutine {
   workouts: DailyWorkout[];
-}
-
-export type ImageState = {
-  state: 'idle' | 'loading' | 'loaded' | 'error';
-  url?: string;
 }
