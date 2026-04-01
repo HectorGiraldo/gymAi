@@ -13,9 +13,8 @@ RUN npm run build
 # Etapa 2: Producción con Nginx
 FROM nginx:alpine
 
-# ¡OJO! Verifica que esta ruta coincida con tu carpeta de salida en 'dist'
-# Algunos Angular modernos generan 'dist/[nombre-app]/browser'
-COPY --from=build /app/dist/generador-de-rutinas-de-gimnasio-ai/browser /usr/share/nginx/html
+
+COPY --from=build /app/dist /usr/share/nginx/html
 
 # Copiamos nuestra config de Nginx
 COPY nginx.conf /etc/nginx/conf.d/default.conf
